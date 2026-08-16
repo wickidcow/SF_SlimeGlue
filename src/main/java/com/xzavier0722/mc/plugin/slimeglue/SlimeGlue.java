@@ -80,7 +80,7 @@ public final class SlimeGlue extends JavaPlugin implements SlimefunAddon {
 
     @Override
     public String getBugTrackerURL() {
-        return "https://github.com/Xzavier0722/SlimeGlue/issues";
+        return "https://github.com/wickidcow/SF_SlimeGlue/issues";
     }
 
     public static SlimeGlue instance() {
