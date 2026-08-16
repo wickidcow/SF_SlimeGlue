@@ -38,7 +38,7 @@ The finished server JAR is written to:
 build/libs/SF_SlimeGlue_Legacy_v1.0.0.jar
 ```
 
-GitHub Actions builds every pull request and push to `master`. Version tags (`v*`) also publish the raw JAR as a GitHub Release asset.
+GitHub Actions builds every pull request and push to `master`. The workflow uploads `SF_SlimeGlue_Legacy_v1.0.0.jar` directly with artifact archiving disabled, so the download is the raw `.jar`, not a ZIP wrapper. Version tags (`v*`) also publish that same raw JAR as a GitHub Release asset.
 
 ## Credits
 
