@@ -63,17 +63,25 @@ jobs:
           retention-days: 30
 
       - name: Publish raw JAR release asset
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          TAG="$GITHUB_REF_NAME"
           JAR="dist/SF_SlimeGlue_Legacy_v${LEGACY_ARTIFACT_VERSION}.jar"
+
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            TAG="$GITHUB_REF_NAME"
+          else
+            TAG="v${LEGACY_ARTIFACT_VERSION}"
+          fi
 
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$JAR" --clobber
           else
-            gh release create "$TAG" "$JAR" --generate-notes --title "SF_SlimeGlue Legacy $TAG"
+            gh release create "$TAG" "$JAR" \
+              --target "$GITHUB_SHA" \
+              --generate-notes \
+              --title "SF_SlimeGlue Legacy $TAG"
           fi
