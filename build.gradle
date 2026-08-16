@@ -1,3 +1,5 @@
+import org.gradle.api.attributes.java.TargetJvmVersion
+
 plugins {
     id 'java'
 }
@@ -36,8 +38,13 @@ repositories {
 }
 
 dependencies {
-    // Paper 26.2 build API. The build runs on JDK 25 but emits Java 21 bytecode.
-    compileOnly 'io.papermc.paper:paper-api:26.2.build.+'
+    // Paper 26.2 publishes JVM 25 API classes. Resolve that build-time API while
+    // still compiling this addon to Java 21 bytecode for Slimefun addon compatibility.
+    compileOnly('io.papermc.paper:paper-api:26.2.build.+') {
+        attributes {
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
+        }
+    }
 
     // Slimefun Legacy preserves the Slimefun4 API/package surface. Use a modern
     // public Slimefun API artifact for compilation; Slimefun itself is never bundled.
