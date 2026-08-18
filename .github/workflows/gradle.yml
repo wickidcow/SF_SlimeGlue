@@ -3,11 +3,9 @@ name: Build SlimeGlue Legacy
 on:
   workflow_dispatch:
   pull_request:
-    branches:
-      - master
+    branches: ['**']
   push:
-    branches:
-      - master
+    branches: ['**']
     tags:
       - 'v*'
 
@@ -53,6 +51,13 @@ jobs:
           jar tf "$OUTPUT" | grep -Fq 'plugin.yml'
           unzip -p "$OUTPUT" plugin.yml | grep -Fq "version: '${LEGACY_ARTIFACT_VERSION}'" || \
             unzip -p "$OUTPUT" plugin.yml | grep -Fq "version: ${LEGACY_ARTIFACT_VERSION}"
+
+      - name: Upload raw JAR artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: dist/${{ env.OUTPUT_NAME }}
+          archive: false
+          if-no-files-found: error
 
       - name: Publish raw JAR release asset
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
