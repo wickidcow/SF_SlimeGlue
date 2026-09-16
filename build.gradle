@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.xzavier0722.mc.plugin'
-version = '1.0.0'
+version = '1.0.1'
 description = 'Slimefun Legacy compatibility bridge for other Minecraft plugins'
 
 java {
@@ -13,6 +13,9 @@ java {
         languageVersion = JavaLanguageVersion.of(25)
     }
 }
+
+def paperApiVersion = providers.gradleProperty('paperApiVersion').orElse('1.21.11-R0.1-SNAPSHOT').get()
+def paperTargetJvm = providers.gradleProperty('paperTargetJvm').orElse('21').get().toInteger()
 
 repositories {
     mavenCentral()
@@ -38,11 +41,9 @@ repositories {
 }
 
 dependencies {
-    // Paper 26.2 publishes JVM 25 API classes. Resolve that build-time API while
-    // still compiling this addon to Java 21 bytecode for Slimefun addon compatibility.
-    compileOnly('io.papermc.paper:paper-api:26.2.build.+') {
+    compileOnly("io.papermc.paper:paper-api:${paperApiVersion}") {
         attributes {
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, paperTargetJvm)
         }
     }
 
@@ -78,5 +79,5 @@ processResources {
 }
 
 jar {
-    archiveFileName = "SF_SlimeGlue_Legacy_v${project.version}.jar"
+    archiveFileName = "SF_SlimeGlue${project.version}.jar"
 }
