@@ -106,7 +106,7 @@ public class QuickShopModule extends ACompatibilityModule {
 
     @Override
     public void enable(Plugin plugin) throws Exception {
-        var version = plugin.getDescription().getVersion();
+        var version = plugin.getPluginMeta().getVersion();
         var splitVersion = version.split("-")[0].split("\\.");
 
         try {
