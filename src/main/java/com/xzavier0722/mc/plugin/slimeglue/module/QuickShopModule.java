@@ -107,14 +107,16 @@ public class QuickShopModule extends ACompatibilityModule {
     @Override
     public void enable(Plugin plugin) throws Exception {
         var version = plugin.getPluginMeta().getVersion();
-        var splitVersion = version.split("-")[0].split("\\.");
+        var splitVersion = version.split("-", 2)[0].split("\\.");
 
         try {
             var major = Integer.parseInt(splitVersion[0]);
-            var sub = Integer.parseInt(splitVersion[2]);
-            var last = Integer.parseInt(splitVersion[3]);
+            // Modern QuickShop versions do not need the legacy reflective API.
+            // Parse the legacy patch components only when that path is used.
 
             if (major < 5) {
+                var sub = Integer.parseInt(splitVersion[1]);
+                var last = Integer.parseInt(splitVersion[2]);
                 SlimeGlue.logger().w("Your QuickShop-Reremake is outdated! Please update to latest version for better performance on checking QuickShop.");
 
                 try {
@@ -147,7 +149,7 @@ public class QuickShopModule extends ACompatibilityModule {
                     }
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
             SlimeGlue.logger().w("Unable to parse version code of Quickshop-Reremake " + version);
             throw e;
         }
