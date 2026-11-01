@@ -41,7 +41,7 @@ jobs:
           trap 'rm -rf "$test_classes"' EXIT
           javac --release 21 -d "$test_classes" \
             src/main/java/com/xzavier0722/mc/plugin/slimeglue/module/QuickShopVersion.java \
-            src/test/java/com/xzavier0722/mc/plugin/slimeglue/module/QuickShopVersionTest.java
+            scripts/java-tests/QuickShopVersionTest.java
           java -cp "$test_classes" com.xzavier0722.mc.plugin.slimeglue.module.QuickShopVersionTest
 
       - name: Set up Gradle
