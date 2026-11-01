@@ -113,7 +113,6 @@ public class QuickShopModule extends ACompatibilityModule {
             var major = Integer.parseInt(splitVersion[0]);
             // Modern QuickShop versions do not need the legacy reflective API.
             // Parse the legacy patch components only when that path is used.
-
             if (major < 5) {
                 var sub = Integer.parseInt(splitVersion[1]);
                 var last = Integer.parseInt(splitVersion[2]);
