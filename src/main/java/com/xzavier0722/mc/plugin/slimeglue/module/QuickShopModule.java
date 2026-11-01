@@ -107,14 +107,9 @@ public class QuickShopModule extends ACompatibilityModule {
     @Override
     public void enable(Plugin plugin) throws Exception {
         var version = plugin.getPluginMeta().getVersion();
-        var splitVersion = version.split("-")[0].split("\\.");
-
         try {
-            var major = Integer.parseInt(splitVersion[0]);
-            var sub = Integer.parseInt(splitVersion[2]);
-            var last = Integer.parseInt(splitVersion[3]);
-
-            if (major < 5) {
+            var quickShopVersion = QuickShopVersion.parse(version);
+            if (quickShopVersion.isLegacy()) {
                 SlimeGlue.logger().w("Your QuickShop-Reremake is outdated! Please update to latest version for better performance on checking QuickShop.");
 
                 try {
@@ -127,7 +122,7 @@ public class QuickShopModule extends ACompatibilityModule {
                     throw e;
                 }
 
-                if (sub >= 8 && last >= 2) {
+                if (quickShopVersion.useLegacyGetShop()) {
                     // For 5.0.0-
                     try {
                         qsMethod = Class.forName("org.maxgamer.quickshop.api.ShopAPI").getDeclaredMethod("getShop", Location.class);
@@ -147,7 +142,7 @@ public class QuickShopModule extends ACompatibilityModule {
                     }
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (IllegalArgumentException e) {
             SlimeGlue.logger().w("Unable to parse version code of Quickshop-Reremake " + version);
             throw e;
         }

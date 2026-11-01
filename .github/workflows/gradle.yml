@@ -27,11 +27,25 @@ jobs:
       - name: Verify immutable release policy
         run: python3 -m unittest discover -s scripts -p 'test_release_safety.py' -v
 
+      - name: Verify QuickShop version and protection contracts
+        run: python3 -m unittest discover -s scripts -p 'test_quickshop_version_contract.py' -v
+
       - name: Set up JDK 25
         uses: actions/setup-java@v5
         with:
           java-version: '25'
           distribution: 'corretto'
+
+      - name: Verify executable QuickShop Java version cases
+        shell: bash
+        run: |
+          set -euo pipefail
+          test_classes="$(mktemp -d)"
+          trap 'rm -rf "$test_classes"' EXIT
+          javac --release 21 -d "$test_classes" \
+            src/main/java/com/xzavier0722/mc/plugin/slimeglue/module/QuickShopVersion.java \
+            scripts/java-tests/QuickShopVersionTest.java
+          java -cp "$test_classes" com.xzavier0722.mc.plugin.slimeglue.module.QuickShopVersionTest
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
