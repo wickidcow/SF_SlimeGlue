@@ -1,40 +1,38 @@
-"""Guard QuickShop version parsing and protected-block behavior against regressions."""
+"""Source contracts complement the executable Java QuickShop version tests."""
 
 from pathlib import Path
-import re
 import unittest
 
-SOURCE = (Path(__file__).resolve().parents[1] / "src/main/java/com/xzavier0722/mc/plugin/slimeglue/module/QuickShopModule.java")
+ROOT = Path(__file__).resolve().parents[1]
+MODULE = ROOT / "src/main/java/com/xzavier0722/mc/plugin/slimeglue/module/QuickShopModule.java"
+PARSER = ROOT / "src/main/java/com/xzavier0722/mc/plugin/slimeglue/module/QuickShopVersion.java"
 
 
 class QuickShopVersionContractTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.source = SOURCE.read_text(encoding="utf-8")
+        cls.module = MODULE.read_text(encoding="utf-8")
+        cls.parser = PARSER.read_text(encoding="utf-8")
 
-    def test_legacy_components_are_read_only_inside_legacy_guard(self):
-        source = self.source
-        guard = source.index("if (major < 5)")
-        major = source.index("Integer.parseInt(splitVersion[0])")
-        minor = source.index("Integer.parseInt(splitVersion[1])")
-        patch = source.index("Integer.parseInt(splitVersion[2])")
-        self.assertLess(major, guard)
-        self.assertLess(guard, minor)
-        self.assertLess(minor, patch)
-        self.assertNotIn("splitVersion[3]", source)
+    def test_module_uses_parser_and_guards_legacy_reflection(self):
+        self.assertIn("QuickShopVersion.parse(version)", self.module)
+        self.assertIn("if (quickShopVersion.isLegacy())", self.module)
+        self.assertIn("if (quickShopVersion.useLegacyGetShop())", self.module)
+        self.assertNotIn("splitVersion[3]", self.module)
 
-    def test_release_suffix_is_separated_before_numeric_parse(self):
-        self.assertIn('version.split("-", 2)[0].split("\\\\.")', self.source)
+    def test_parser_preserves_four_part_threshold(self):
+        self.assertIn("int patch = Integer.parseInt(parts[2])", self.parser)
+        self.assertIn("int build = parts.length == 4 ? Integer.parseInt(parts[3]) : 0", self.parser)
+        self.assertIn("return patch >= 8 && build >= 2;", self.parser)
 
     def test_legacy_api_selection_is_unchanged(self):
-        self.assertIn("if (sub >= 8 && last >= 2)", self.source)
-        self.assertIn('getDeclaredMethod("getShop", Location.class)', self.source)
-        self.assertIn('getDeclaredMethod("getShopWithCaching", Location.class)', self.source)
+        self.assertIn('getDeclaredMethod("getShop", Location.class)', self.module)
+        self.assertIn('getDeclaredMethod("getShopWithCaching", Location.class)', self.module)
 
     def test_protection_and_owner_paths_are_unchanged(self):
-        self.assertIn("return !isQuickshop(location);", self.source)
-        self.assertIn("player.getUniqueId().equals(getQuickshopOwner(location))", self.source)
-        self.assertIn("return shop == null ? null : shop.getOwner();", self.source)
+        self.assertIn("return !isQuickshop(location);", self.module)
+        self.assertIn("player.getUniqueId().equals(getQuickshopOwner(location))", self.module)
+        self.assertIn("return shop == null ? null : shop.getOwner();", self.module)
 
 
 if __name__ == "__main__":
